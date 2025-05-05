@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>🎂</title>
+<style>
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+    color: #3c1e1e;
+  }
+  #app {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 10px;
+    position: relative;
+    z-index: 1;
+  }
+  .slideshow {
+    width: 400px;
+    height: 400px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+    background: #fff;
+    position: relative;
+  }
+  .slideshow img, .slide-text {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0; left: 0;
+    border-radius: 16px;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .slideshow img.visible, .slide-text.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .slide-text {
+    background: rgba(255, 255, 255, 0.95);
+    color: #532e2e;
+    font-size: 20px;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+    overflow-y: hidden;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 500;
+  }
+  .text-slideshow {
+    margin-top: 15px;
+    width: 450px;
+    height: 200px;
+    border-radius: 16px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    position: relative;
+    background: transparent;
+  }
+  #confetti-canvas {
+    pointer-events: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+  }
+
+  .birthday-cake {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 450px;
+    height: 250px;
+    background-image: url('kue.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 2;
+    opacity: 0.9;
+  }
+  .birthday-cake.left {
+    left: 15px;
+  }
+  .birthday-cake.right {
+    right: 15px;
+  }
+
+  @media (max-width: 380px) {
+    .slideshow, .text-slideshow {
+      width: 90vw;
+    }
+    .birthday-cake {
+      width: 80px;
+      height: 80px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Kue ulang tahun kiri dan kanan -->
+<div class="birthday-cake left"></div>
+<div class="birthday-cake right"></div>
+
+<div id="app" role="main" aria-label="Ucapan ulang tahun dan slideshow foto">
+  <div class="slideshow" aria-live="polite" aria-atomic="true" aria-label="Slide foto ulang tahun">
+    <img src="Her.jpg" alt="Foto 1" class="visible" />
+    <img src="Her2.jpg" alt="Foto 2" />
+    <img src="Her3.jpg" alt="Foto 3" />
+    <img src="Her4.jpg" alt="Foto 4" />
+    <img src="Her5.jpg" alt="Foto 5" />
+    <img src="Her6.jpg" alt="Foto 6" />
+  </div>
+
+  <div class="text-slideshow" aria-live="polite" aria-atomic="true" aria-label="Pesan ucapan ulang tahun">
+    <div class="slide-text visible">
+      HAPPY BIRTHDAY SAYANGKU, RADEN AJENGKU, GUNGGEK-KU, RATUKU, CINTAKU, CANTIKKU. NADHIRA
+    </div>
+    <div class="slide-text">
+      Hari ini bertepatan dengan hari lahirmu, 6 MEI 2006. Semoga di hari yang spesial ini, kamu mendapatkan semua kebahagiaan yang kamu impikan.
+    </div>
+    <div class="slide-text">
+      Aku bersyukur atas semua kenangan manis, tawa, dan kebahagiaan yang telah kita bagi. Semoga di tahun yang baru ini, segala impian dan harapanmu dapat tercapai.
+    </div>
+    <div class="slide-text">
+      Aku akan selalu ada di sisimu, mendukungmu dan mencintaimu apa adanya. Selamat bertambah usia, Sayang.
+    </div>
+    <div class="slide-text">
+      Semoga hari ini dan selamanya penuh dengan cinta, kebahagiaan, dan keberkahan.
+    </div>
+    <div class="slide-text">
+        Dari power rangers merah yang jatuh cinta padamu. Mario Ivansyah Saputra
+    </div>
+  </div>
+</div>
+
+<audio id="bg-audio" src="happy-birthday-322777.mp3" autoplay loop></audio>
+<canvas id="confetti-canvas"></canvas>
+
+<script>
+  (function(){
+    const imageSlides = document.querySelectorAll('.slideshow img');
+    const textSlides = document.querySelectorAll('.slide-text');
+    let currentIndex = 0;
+    const slideCount = Math.max(imageSlides.length, textSlides.length);
+
+    function showSlides(index) {
+      imageSlides.forEach((slide, i) => {
+        slide.classList.toggle('visible', i === index % imageSlides.length);
+      });
+      textSlides.forEach((slide, i) => {
+        slide.classList.toggle('visible', i === index % textSlides.length);
+      });
+    }
+
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % slideCount;
+      showSlides(currentIndex);
+    }
+
+    showSlides(currentIndex);
+    setInterval(nextSlide, 5000);
+  })();
+
+  (function(){
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H;
+
+    function resize() {
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W;
+      canvas.height = H;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const confettiCount = 150;
+    const confetti = [];
+
+    class Confetto {
+      constructor() {
+        this.x = Math.random() * W;
+        this.y = Math.random() * H - H;
+        this.r = (Math.random() * 6) + 4;
+        this.d = (Math.random() * confettiCount) + 10;
+        this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+        this.tilt = Math.floor(Math.random() * 10) - 10;
+        this.tiltAngleIncremental = (Math.random() * 0.07) + 0.05;
+        this.tiltAngle = 0;
+      }
+      update() {
+        this.tiltAngle += this.tiltAngleIncremental;
+        this.y += (Math.cos(this.d) + 3 + this.r / 2) / 2;
+        this.x += Math.sin(this.tiltAngle) * 2;
+        this.tilt = Math.sin(this.tiltAngle) * 15;
+        if (this.y > H) {
+          this.x = Math.random() * W;
+          this.y = -10;
+          this.tilt = Math.floor(Math.random() * 10) - 10;
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.lineWidth = this.r / 2;
+        ctx.strokeStyle = this.color;
+        ctx.moveTo(this.x + this.tilt + this.r / 4, this.y);
+        ctx.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 4);
+        ctx.stroke();
+      }
+    }
+
+    function initConfetti() {
+      for (let i = 0; i < confettiCount; i++) {
+        confetti.push(new Confetto());
+      }
+    }
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < confettiCount; i++) {
+        confetti[i].draw();
+        confetti[i].update();
+      }
+      requestAnimationFrame(draw);
+    }
+
+    initConfetti();
+    draw();
+  })();
+</script>
+</body>
+</html>
